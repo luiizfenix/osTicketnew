@@ -221,6 +221,14 @@ class EndUser extends BaseAuthenticatedUser {
             : call_user_func(array($this->user, $name));
     }
 
+    function isPrimaryContact() {
+        return ($this->user) ? $this->user->isPrimaryContact() : null;
+    }
+
+    function getOrganization() {
+        return ($this->user) ? $this->user->getOrganization() : null;
+    }
+
     function getVar($tag) {
         $u = $this;
         // Traverse the $user properties of all nested user objects to get

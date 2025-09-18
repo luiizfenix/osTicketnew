@@ -460,6 +460,7 @@ CREATE TABLE `%TABLE_PREFIX%help_topic` (
   `topic_id` int(11) unsigned NOT NULL auto_increment,
   `topic_pid` int(10) unsigned NOT NULL default '0',
   `ispublic` tinyint(1) unsigned NOT NULL default '1',
+  `orgpconly` tinyint(1) unsigned NOT NULL default '0',
   `noautoresp` tinyint(3) unsigned NOT NULL default '0',
   `flags` int(10) unsigned DEFAULT '0',
   `status_id` int(10) unsigned NOT NULL default '0',
@@ -496,6 +497,15 @@ CREATE TABLE `%TABLE_PREFIX%help_topic_form` (
   PRIMARY KEY (`id`),
   KEY `topic-form` (`topic_id`, `form_id`)
 ) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `%TABLE_PREFIX%help_topic_organization`;
+CREATE TABLE `%TABLE_PREFIX%help_topic_organization` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `topic_id` int(11) unsigned NOT NULL,
+  `organization_id` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topic_organization` (`topic_id`,`organization_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `%TABLE_PREFIX%organization`;
 CREATE TABLE `%TABLE_PREFIX%organization` (
