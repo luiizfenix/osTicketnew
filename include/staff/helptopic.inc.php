@@ -110,7 +110,7 @@ $info=Format::htmlchars(($errors && $_POST)?$_POST:$info, true);
                 <select name="organizations[]" class="multi-select" multiple>
                     <?php
                     $allOrganizations = Organization::getAllOrganizations();
-                    while (list($id,$name) = each($allOrganizations)) {
+                    foreach ($allOrganizations as $id => $name) {
                         if ($id == $info['id'])
                             continue; ?>
                         <option value="<?php echo $id; ?>"<?php echo (in_array($id,$topic_organization_ids))?'selected':''; ?>><?php echo $name; ?></option>

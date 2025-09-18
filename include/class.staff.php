@@ -55,11 +55,17 @@ implements AuthenticatedUser, EmailContact, TemplateVariable, Searchable {
     var $_perm;
 
     const PERM_STAFF = 'visibility.agents';
+    const PERM_SDIRECTORY = 'staff.dir';
 
     static protected $perms = array(
         self::PERM_STAFF => array(
             'title' => /* @trans */ 'Agent',
             'desc'  => /* @trans */ 'Ability to see Agents in all Departments',
+            'primary' => true,
+        ),
+        self::PERM_SDIRECTORY => array(
+            'title' => /* @trans */ 'Staff Directory',
+            'desc' => /* @trans */ 'Ability to access the staff directory',
             'primary' => true,
         ),
     );
@@ -1442,7 +1448,8 @@ implements AuthenticatedUser, EmailContact, TemplateVariable, Searchable {
     }
 
 }
-RolePermission::register(/* @trans */ 'Miscellaneous', Staff::getPermissions());
+RolePermission::register(/* @trans */ 'Staff',
+    Staff::getPermissions());
 
 interface RestrictedAccess {
     function checkStaffPerm($staff);
@@ -1841,6 +1848,7 @@ extends AbstractForm {
             Organization::PERM_DELETE,
             FAQ::PERM_MANAGE,
             Dept::PERM_DEPT,
+            Staff::PERM_SDIRECTORY,
             Staff::PERM_STAFF,
         );
         return $clean;

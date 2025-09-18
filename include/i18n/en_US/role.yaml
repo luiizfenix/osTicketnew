@@ -37,7 +37,8 @@
     task.close,
     task.delete,
     canned.manage,
-    thread.edit]
+    thread.edit,
+    staff.dir]
 
 - id: 2
   flags: 1
@@ -62,7 +63,8 @@
     task.transfer,
     task.reply,
     task.close,
-    canned.manage]
+    canned.manage,
+    staff.dir]
 
 - id: 3
   flags: 1
