@@ -107,7 +107,7 @@ $info=Format::htmlchars(($errors && $_POST)?$_POST:$info, true);
                 <?php echo __('Allowed Organizations');?>:
             </td>
             <td>
-                <select name="organizations[]" class="multi-select" multiple>
+                <select name="organizations[]" class="multi-select" multiple style="height:150px;">
                     <?php
                     $allOrganizations = Organization::getAllOrganizations();
                     foreach ($allOrganizations as $id => $name) {
