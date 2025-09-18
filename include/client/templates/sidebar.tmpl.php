@@ -1,9 +1,9 @@
 <?php
 $BUTTONS = isset($BUTTONS) ? $BUTTONS : true;
 ?>
-    <div class="sidebar pull-right">
+    <div class="sidebar">
 <?php if ($BUTTONS) { ?>
-        <div class="front-page-button flush-right">
+        <div class="front-page-button">
 <p>
 <?php
     if ($cfg->getClientRegistrationMode() != 'disabled'

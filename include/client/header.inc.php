@@ -150,6 +150,7 @@ if (($all_langs = Internationalization::getConfiguredSystemLanguages())
         <div class="clear"></div>
         <?php
         if($nav){ ?>
+        <a class="nav-toggle" href="#">&#9776; <?php echo __('Menu'); ?></a>
         <ul id="nav" class="flush-left">
             <?php
             if($nav && ($navs=$nav->getNavLinks()) && is_array($navs)){

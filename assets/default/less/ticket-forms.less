@@ -168,3 +168,39 @@
     width: auto !important
   }
 }
+
+.form-container {
+    width: 100%;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.form-col-label {
+    width: 200px;
+    padding-right: 10px;
+    text-align: right;
+}
+
+.form-col-field {
+    flex: 1;
+}
+
+.form-col-full {
+    width: 100%;
+}
+
+@media screen and (max-width: 860px) {
+    .form-row {
+        flex-direction: column;
+    }
+
+    .form-col-label {
+        width: 100%;
+        text-align: left;
+        margin-bottom: 5px;
+    }
+}

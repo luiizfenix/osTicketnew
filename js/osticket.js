@@ -148,6 +148,11 @@ $(document).ready(function(){
     $('div.thread-body a').each(function() {
         $(this).attr('target', '_blank');
     });
+
+    $(document).on('click', '.nav-toggle', function(e) {
+        e.preventDefault();
+        $('#nav').toggleClass('active');
+    });
 });
 
 showImagesInline = function(urls, thread_id) {
@@ -218,4 +223,9 @@ $(document).on('click', '.link:not(a):not(.button)', function(event) {
     .hide()
     .insertBefore($e)
     .get(0).click(event);
+});
+
+$(document).on('click', '.nav-toggle', function(e) {
+    e.preventDefault();
+    $('#nav').toggleClass('active');
 });
