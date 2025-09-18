@@ -14,6 +14,8 @@
     vim: expandtab sw=4 ts=4 sts=4:
 **********************************************************************/
 require('staff.inc.php');
+if (!$thisstaff->hasPerm(Staff::PERM_SDIRECTORY))
+    accessDenied();
 $page='directory.inc.php';
 $nav->setTabActive('dashboard');
 $ost->addExtraHeader('<meta name="tip-namespace" content="dashboard.staff_directory" />',

@@ -70,10 +70,6 @@ implements AuthenticatedUser, EmailContact, TemplateVariable, Searchable {
         ),
     );
 
-    static function getPermissions() {
-        return self::$perms;
-    }
-
     function __onload() {
     }
 
@@ -1452,7 +1448,6 @@ implements AuthenticatedUser, EmailContact, TemplateVariable, Searchable {
     }
 
 }
-include_once INCLUDE_DIR.'class.role.php';
 RolePermission::register(/* @trans */ 'Staff',
     Staff::getPermissions());
 
