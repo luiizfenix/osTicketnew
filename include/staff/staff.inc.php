@@ -20,6 +20,7 @@ if ($_REQUEST['a']=='add'){
             Organization::PERM_DELETE,
             FAQ::PERM_MANAGE,
             Dept::PERM_DEPT,
+            Staff::PERM_SDIRECTORY,
             Staff::PERM_STAFF,
         ));
     }
