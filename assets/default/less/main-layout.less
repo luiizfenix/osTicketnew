@@ -1,10 +1,11 @@
 body {
-  background: url('../images/page_bg.png') top left repeat-x #c8c8c8;
+  background: #c8c8c8;
 }
 
 #container {
   background: #fff;
-  width: 840px;
+  width: 90%;
+  max-width: 840px;
   margin: 0 auto;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
@@ -13,7 +14,8 @@ body {
 
 #header {
   position: relative;
-  height: 71px;
+  height: auto;
+  min-height: 71px;
   padding: 0 20px;
 
   #logo {
@@ -111,4 +113,68 @@ body {
     margin: 0 auto;
     background: url('../images/poweredby.png') top left no-repeat;
   }
+}
+
+.nav-toggle {
+    display: none;
+}
+
+@media screen and (max-width: 860px) {
+    .nav-toggle {
+        display: block;
+        text-align: center;
+        padding: 10px;
+        background: #f0f0f0;
+        cursor: pointer;
+    }
+    #container {
+        width: 100%;
+        box-shadow: none;
+    }
+    #header {
+        text-align: center;
+        #logo {
+            float: none;
+            margin: 0 auto;
+        }
+        p {
+            float: none;
+            width: 100%;
+            text-align: center;
+        }
+    }
+    #nav {
+        display: none;
+        margin: 0;
+        height: auto;
+        &.active {
+            display: block;
+        }
+        li {
+            display: block;
+            margin: 5px 0;
+            a {
+                float: none;
+                display: block;
+                width: auto;
+                margin: 0 10px;
+            }
+        }
+    }
+
+    #landing_page .main-content {
+        width: 100%;
+        float: none;
+    }
+
+    #landing_page .sidebar {
+        width: 100%;
+        float: none;
+        margin-top: 20px;
+    }
+
+    .featured-category {
+        width: 100%;
+        box-sizing: border-box;
+    }
 }
