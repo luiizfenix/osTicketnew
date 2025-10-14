@@ -8,21 +8,21 @@ from flasgger import Swagger
 # Load environment variables from .env file
 load_dotenv()
 
+# --- Database Configuration ---
+db_config = {
+    'DBUSER': os.getenv('DBUSER', 'root'),
+    'DBPASS': os.getenv('DBPASS', ''),
+    'DBHOST': os.getenv('DBHOST', 'localhost'),
+    'DBNAME': os.getenv('DBNAME', 'osticket'),
+    'TABLE_PREFIX': os.getenv('TABLE_PREFIX', 'ost_')
+}
+
 # --- App Initialization ---
 app = Flask(__name__)
 
 # Database connection
-db_uri = os.getenv('DATABASE_URI')
-if not db_uri:
-    db_config = {
-        'DBUSER': os.getenv('DBUSER', 'root'),
-        'DBPASS': os.getenv('DBPASS', ''),
-        'DBHOST': os.getenv('DBHOST', 'localhost'),
-        'DBNAME': os.getenv('DBNAME', 'osticket'),
-        'TABLE_PREFIX': os.getenv('TABLE_PREFIX', 'ost_')
-    }
-    db_uri = f"mysql+pymysql://{db_config['DBUSER']}:{db_config['DBPASS']}@{db_config['DBHOST']}/{db_config['DBNAME']}"
-
+db_uri = os.getenv('DATABASE_URI') or \
+    f"mysql+pymysql://{db_config['DBUSER']}:{db_config['DBPASS']}@{db_config['DBHOST']}/{db_config['DBNAME']}"
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

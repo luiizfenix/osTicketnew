@@ -270,7 +270,7 @@ class FormEntry(db.Model):
         }
 
 class FormEntryValue(db.Model):
-    __tablename__ = f'{TABLE_PREFIX}form_entry_value'
+    __tablename__ = f'{TABLE_PREFIX}form_entry_values'
     entry_id = db.Column(db.Integer, db.ForeignKey(f'{TABLE_PREFIX}form_entry.id'), primary_key=True)
     field_id = db.Column(db.Integer, db.ForeignKey(f'{TABLE_PREFIX}form_field.id'), primary_key=True)
     value = db.Column(db.Text)
