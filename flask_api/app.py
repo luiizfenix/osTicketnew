@@ -1,8 +1,8 @@
 import os
 import re
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+from flask_api.extensions import db
 from flasgger import Swagger
 
 # Load environment variables from .env file
@@ -26,12 +26,13 @@ db_uri = os.getenv('DATABASE_URI') or \
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
 # --- Flasgger Initialization ---
 app.config['SWAGGER'] = {
     'title': 'osTicket API',
     'uiversion': 3,
+    'basePath': os.getenv('FLASK_BASE_PATH', '/'),
     'definitions': {
         "Ticket": {
             "type": "object",
@@ -201,8 +202,8 @@ app.config['SWAGGER'] = {
 swagger = Swagger(app)
 
 # --- Import Routes ---
-# Import routes after db initialization to avoid circular imports
-from routes import *
+from flask_api.routes import register_blueprints
+register_blueprints(app)
 
 if __name__ == '__main__':
     app.run(debug=True)

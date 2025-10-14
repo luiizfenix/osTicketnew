@@ -1,6 +1,5 @@
-from app import db
+from .extensions import db
 from sqlalchemy.orm import aliased
-from app import db
 
 TABLE_PREFIX = 'ost_'
 
@@ -116,6 +115,7 @@ class Ticket(db.Model):
     closed = db.Column(db.DateTime)
 
     user = db.relationship('User', backref='tickets')
+    status = db.relationship('TicketStatus', primaryjoin='Ticket.status_id==TicketStatus.id', foreign_keys='Ticket.status_id', uselist=False)
 
     def to_dict(self):
         return {
@@ -287,7 +287,6 @@ class FormEntryValue(db.Model):
 class FAQ(db.Model):
     __tablename__ = f'{TABLE_PREFIX}faq'
     id = db.Column(db.Integer, primary_key=True)
-    category_id = db.Column(db.Integer, db.ForeignKey(f'{TABLE_PREFIX}faq_category.id'))
     ispublished = db.Column(db.Boolean)
     question = db.Column(db.String(255))
     answer = db.Column(db.Text)
@@ -297,7 +296,6 @@ class FAQ(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'category_id': self.category_id,
             'ispublished': self.ispublished,
             'question': self.question,
             'answer': self.answer,
@@ -305,21 +303,38 @@ class FAQ(db.Model):
             'updated': self.updated.isoformat() if self.updated else None,
         }
 
-class FAQCategory(db.Model):
-    __tablename__ = f'{TABLE_PREFIX}faq_category'
+class Queue(db.Model):
+    __tablename__ = f'{TABLE_PREFIX}queue'
     id = db.Column(db.Integer, primary_key=True)
-    ispublic = db.Column(db.Boolean)
-    name = db.Column(db.String(255))
-    description = db.Column(db.Text)
+    parent_id = db.Column(db.Integer)
+    staff_id = db.Column(db.Integer)
+    title = db.Column(db.String(60))
+    sort = db.Column(db.Integer)
+    config = db.Column(db.Text)
     created = db.Column(db.DateTime)
     updated = db.Column(db.DateTime)
 
     def to_dict(self):
         return {
             'id': self.id,
-            'ispublic': self.ispublic,
-            'name': self.name,
-            'description': self.description,
+            'parent_id': self.parent_id,
+            'staff_id': self.staff_id,
+            'title': self.title,
+            'sort': self.sort,
+            'config': self.config,
             'created': self.created.isoformat() if self.created else None,
             'updated': self.updated.isoformat() if self.updated else None,
+        }
+
+class TicketStatus(db.Model):
+    __tablename__ = f'{TABLE_PREFIX}ticket_status'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(60))
+    state = db.Column(db.String(16))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'state': self.state,
         }
