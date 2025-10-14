@@ -1,27 +1,35 @@
-from app import db, db_config
+from app import db
 
-TABLE_PREFIX = db_config['TABLE_PREFIX']
+TABLE_PREFIX = 'ost_'
 
 class User(db.Model):
     __tablename__ = f'{TABLE_PREFIX}user'
     id = db.Column(db.Integer, primary_key=True)
     org_id = db.Column(db.Integer, db.ForeignKey(f'{TABLE_PREFIX}organization.id'))
+    default_email_id = db.Column(db.Integer)
     name = db.Column(db.String(128))
-    email = db.Column(db.String(128))
     phone = db.Column(db.String(24))
     created = db.Column(db.DateTime)
     updated = db.Column(db.DateTime)
+
+    email = db.relationship('UserEmail', primaryjoin='User.default_email_id==UserEmail.id', foreign_keys='User.default_email_id', uselist=False)
 
     def to_dict(self):
         return {
             'id': self.id,
             'org_id': self.org_id,
             'name': self.name,
-            'email': self.email,
+            'email': self.email.address if self.email else None,
             'phone': self.phone,
             'created': self.created.isoformat() if self.created else None,
             'updated': self.updated.isoformat() if self.updated else None,
         }
+
+class UserEmail(db.Model):
+    __tablename__ = f'{TABLE_PREFIX}user_email'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(f'{TABLE_PREFIX}user.id'))
+    address = db.Column(db.String(128))
 
 class Department(db.Model):
     __tablename__ = f'{TABLE_PREFIX}department'

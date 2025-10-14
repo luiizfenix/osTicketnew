@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from app import app, db
-from models import User, Organization, Ticket, Thread, FormEntry, FormEntryValue, FAQ, Department, HelpTopic
+from models import User, UserEmail, Organization, Ticket, Thread, FormEntry, FormEntryValue, FAQ, Department, HelpTopic
 
 @app.route('/tickets', methods=['GET'])
 def get_tickets():
