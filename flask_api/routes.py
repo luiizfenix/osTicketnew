@@ -5,18 +5,100 @@ from models import User, UserEmail, Organization, Ticket, Thread, FormEntry, For
 @app.route('/tickets', methods=['GET'])
 def get_tickets():
     """
-    Get a list of all tickets.
+    Get a paginated, sorted, and filtered list of tickets.
     ---
+    parameters:
+      - name: page
+        in: query
+        type: integer
+        default: 1
+        description: The page number to retrieve.
+      - name: per_page
+        in: query
+        type: integer
+        default: 10
+        description: The number of tickets to retrieve per page.
+      - name: sort_by
+        in: query
+        type: string
+        default: created
+        description: The field to sort by (e.g., 'created', 'updated', 'status_id').
+      - name: sort_order
+        in: query
+        type: string
+        default: desc
+        enum: ['asc', 'desc']
+        description: The sort order ('asc' or 'desc').
+      - name: status_id
+        in: query
+        type: integer
+        description: Filter by status ID.
+      - name: dept_id
+        in: query
+        type: integer
+        description: Filter by department ID.
+      - name: user_id
+        in: query
+        type: integer
+        description: Filter by user ID.
+      - name: staff_id
+        in: query
+        type: integer
+        description: Filter by staff ID.
     responses:
       200:
-        description: A list of tickets.
+        description: A paginated list of tickets.
         schema:
-          type: array
-          items:
-            $ref: '#/definitions/Ticket'
+          type: object
+          properties:
+            total:
+              type: integer
+            pages:
+              type: integer
+            next_page:
+              type: string
+            prev_page:
+              type: string
+            results:
+              type: array
+              items:
+                $ref: '#/definitions/Ticket'
     """
-    tickets = Ticket.query.all()
-    return jsonify([ticket.to_dict() for ticket in tickets])
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    sort_by = request.args.get('sort_by', 'created')
+    sort_order = request.args.get('sort_order', 'desc')
+
+    query = Ticket.query
+
+    # Filtering
+    if 'status_id' in request.args:
+        query = query.filter_by(status_id=request.args.get('status_id', type=int))
+    if 'dept_id' in request.args:
+        query = query.filter_by(dept_id=request.args.get('dept_id', type=int))
+    if 'user_id' in request.args:
+        query = query.filter_by(user_id=request.args.get('user_id', type=int))
+    if 'staff_id' in request.args:
+        query = query.filter_by(staff_id=request.args.get('staff_id', type=int))
+
+    # Sorting
+    if hasattr(Ticket, sort_by):
+        if sort_order == 'desc':
+            query = query.order_by(getattr(Ticket, sort_by).desc())
+        else:
+            query = query.order_by(getattr(Ticket, sort_by).asc())
+
+    # Pagination
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    tickets = pagination.items
+
+    return jsonify({
+        'total': pagination.total,
+        'pages': pagination.pages,
+        'next_page': pagination.next_num,
+        'prev_page': pagination.prev_num,
+        'results': [ticket.to_dict() for ticket in tickets]
+    })
 
 @app.route('/tickets/<int:ticket_id>', methods=['GET'])
 def get_ticket(ticket_id):
