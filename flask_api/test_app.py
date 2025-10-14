@@ -3,7 +3,7 @@ import os
 
 os.environ['DATABASE_URI'] = 'sqlite:///:memory:'
 from app import app, db
-from models import User, UserEmail
+from models import User, UserEmail, Form, FormField, FormEntry, FormEntryValue
 
 class AppTestCase(unittest.TestCase):
     def setUp(self):
@@ -45,6 +45,30 @@ class AppTestCase(unittest.TestCase):
             # Assert that the email is correct
             self.assertEqual(response.status_code, 200)
             self.assertEqual(data['email'], 'test@example.com')
+
+    def test_get_user_with_phone(self):
+        """Test that the user's phone number is retrieved correctly."""
+        with self.app.app_context():
+            # Create a dummy user and form data
+            user = User(id=1, name='Test User')
+            form = Form(id=1, form_type='U')
+            phone_field = FormField(id=1, form_id=1, name='phone')
+            form_entry = FormEntry(id=1, form_id=1, object_id=1, object_type='U')
+            phone_value = FormEntryValue(entry_id=1, field_id=1, value='123-456-7890')
+            db.session.add(user)
+            db.session.add(form)
+            db.session.add(phone_field)
+            db.session.add(form_entry)
+            db.session.add(phone_value)
+            db.session.commit()
+
+            # Make a request to the get_user endpoint
+            response = self.client.get('/users/1')
+            data = response.get_json()
+
+            # Assert that the phone number is correct
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(data['phone'], '123-456-7890')
 
 if __name__ == '__main__':
     unittest.main()

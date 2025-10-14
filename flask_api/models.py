@@ -1,4 +1,6 @@
 from app import db
+from sqlalchemy.orm import aliased
+from app import db
 
 TABLE_PREFIX = 'ost_'
 
@@ -8,7 +10,6 @@ class User(db.Model):
     org_id = db.Column(db.Integer, db.ForeignKey(f'{TABLE_PREFIX}organization.id'))
     default_email_id = db.Column(db.Integer)
     name = db.Column(db.String(128))
-    phone = db.Column(db.String(24))
     created = db.Column(db.DateTime)
     updated = db.Column(db.DateTime)
 
@@ -20,10 +21,28 @@ class User(db.Model):
             'org_id': self.org_id,
             'name': self.name,
             'email': self.email.address if self.email else None,
-            'phone': self.phone,
+            'phone': self.get_phone(),
             'created': self.created.isoformat() if self.created else None,
             'updated': self.updated.isoformat() if self.updated else None,
         }
+
+    def get_phone(self):
+        """Retrieves the user's phone number from the dynamic form data."""
+        form_entry_alias = aliased(FormEntry)
+        form_entry_value_alias = aliased(FormEntryValue)
+        form_field_alias = aliased(FormField)
+
+        phone_value = db.session.query(form_entry_value_alias.value).join(
+            form_entry_alias, form_entry_alias.id == form_entry_value_alias.entry_id
+        ).join(
+            form_field_alias, form_field_alias.id == form_entry_value_alias.field_id
+        ).filter(
+            form_entry_alias.object_id == self.id,
+            form_entry_alias.object_type == 'U',
+            form_field_alias.name == 'phone'
+        ).scalar()
+
+        return phone_value
 
 class UserEmail(db.Model):
     __tablename__ = f'{TABLE_PREFIX}user_email'
@@ -202,6 +221,7 @@ class File(db.Model):
 class Form(db.Model):
     __tablename__ = f'{TABLE_PREFIX}form'
     id = db.Column(db.Integer, primary_key=True)
+    form_type = db.Column('type', db.String(1))
     title = db.Column(db.String(255))
 
     fields = db.relationship('FormField', backref='form', lazy=True)
@@ -209,6 +229,7 @@ class Form(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
+            'form_type': self.form_type,
             'title': self.title,
             'fields': [field.to_dict() for field in self.fields]
         }
