@@ -1,4 +1,5 @@
 from flask import jsonify, request
+from datetime import datetime
 from app import app, db
 from models import User, UserEmail, Organization, Ticket, Thread, FormEntry, FormEntryValue, FAQ, Department, HelpTopic
 
@@ -29,6 +30,10 @@ def get_tickets():
         default: desc
         enum: ['asc', 'desc']
         description: The sort order ('asc' or 'desc').
+      - name: number
+        in: query
+        type: string
+        description: Filter by ticket number.
       - name: status_id
         in: query
         type: integer
@@ -37,6 +42,14 @@ def get_tickets():
         in: query
         type: integer
         description: Filter by department ID.
+      - name: topic_id
+        in: query
+        type: integer
+        description: Filter by topic ID.
+      - name: team_id
+        in: query
+        type: integer
+        description: Filter by team ID.
       - name: user_id
         in: query
         type: integer
@@ -45,6 +58,40 @@ def get_tickets():
         in: query
         type: integer
         description: Filter by staff ID.
+      - name: created_after
+        in: query
+        type: string
+        format: date-time
+        description: Filter by tickets created after a certain date (ISO 8601 format).
+      - name: created_before
+        in: query
+        type: string
+        format: date-time
+        description: Filter by tickets created before a certain date (ISO 8601 format).
+      - name: updated_after
+        in: query
+        type: string
+        format: date-time
+        description: Filter by tickets updated after a certain date (ISO 8601 format).
+      - name: updated_before
+        in: query
+        type: string
+        format: date-time
+        description: Filter by tickets updated before a certain date (ISO 8601 format).
+      - name: closed_after
+        in: query
+        type: string
+        format: date-time
+        description: Filter by tickets closed after a certain date (ISO 8601 format).
+      - name: closed_before
+        in: query
+        type: string
+        format: date-time
+        description: Filter by tickets closed before a certain date (ISO 8601 format).
+      - name: is_closed
+        in: query
+        type: boolean
+        description: Filter by whether the ticket is closed or not.
     responses:
       200:
         description: A paginated list of tickets.
@@ -72,14 +119,38 @@ def get_tickets():
     query = Ticket.query
 
     # Filtering
+    if 'number' in request.args:
+        query = query.filter_by(number=request.args.get('number'))
     if 'status_id' in request.args:
         query = query.filter_by(status_id=request.args.get('status_id', type=int))
     if 'dept_id' in request.args:
         query = query.filter_by(dept_id=request.args.get('dept_id', type=int))
+    if 'topic_id' in request.args:
+        query = query.filter_by(topic_id=request.args.get('topic_id', type=int))
+    if 'team_id' in request.args:
+        query = query.filter_by(team_id=request.args.get('team_id', type=int))
     if 'user_id' in request.args:
         query = query.filter_by(user_id=request.args.get('user_id', type=int))
     if 'staff_id' in request.args:
         query = query.filter_by(staff_id=request.args.get('staff_id', type=int))
+    if 'created_after' in request.args:
+        query = query.filter(Ticket.created >= datetime.fromisoformat(request.args.get('created_after')))
+    if 'created_before' in request.args:
+        query = query.filter(Ticket.created <= datetime.fromisoformat(request.args.get('created_before')))
+    if 'updated_after' in request.args:
+        query = query.filter(Ticket.updated >= datetime.fromisoformat(request.args.get('updated_after')))
+    if 'updated_before' in request.args:
+        query = query.filter(Ticket.updated <= datetime.fromisoformat(request.args.get('updated_before')))
+    if 'closed_after' in request.args:
+        query = query.filter(Ticket.closed >= datetime.fromisoformat(request.args.get('closed_after')))
+    if 'closed_before' in request.args:
+        query = query.filter(Ticket.closed <= datetime.fromisoformat(request.args.get('closed_before')))
+    if 'is_closed' in request.args:
+        is_closed = request.args.get('is_closed').lower() in ['true', '1']
+        if is_closed:
+            query = query.filter(Ticket.closed.isnot(None))
+        else:
+            query = query.filter(Ticket.closed.is_(None))
 
     # Sorting
     if hasattr(Ticket, sort_by):

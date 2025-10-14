@@ -1,5 +1,6 @@
 import unittest
 import os
+from datetime import datetime, timedelta
 
 os.environ['DATABASE_URI'] = 'sqlite:///:memory:'
 from app import app, db
@@ -122,6 +123,82 @@ class AppTestCase(unittest.TestCase):
 
             # Make a request to the get_tickets endpoint with filtering
             response = self.client.get('/tickets?status_id=1')
+            data = response.get_json()
+
+            # Assert that the filtering is correct
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(data['results']), 1)
+            self.assertEqual(data['results'][0]['number'], '1')
+
+    def test_get_tickets_filtering_by_number(self):
+        """Test that the tickets are filtered correctly by number."""
+        with self.app.app_context():
+            # Create dummy tickets with different numbers
+            ticket1 = Ticket(ticket_id=1, number='12345')
+            ticket2 = Ticket(ticket_id=2, number='67890')
+            db.session.add(ticket1)
+            db.session.add(ticket2)
+            db.session.commit()
+
+            # Make a request to the get_tickets endpoint with filtering by number
+            response = self.client.get('/tickets?number=12345')
+            data = response.get_json()
+
+            # Assert that the filtering is correct
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(data['results']), 1)
+            self.assertEqual(data['results'][0]['number'], '12345')
+
+    def test_get_tickets_filtering_by_topic_and_team(self):
+        """Test that the tickets are filtered correctly by topic and team."""
+        with self.app.app_context():
+            # Create dummy tickets with different topics and teams
+            ticket1 = Ticket(ticket_id=1, number='1', topic_id=1, team_id=1)
+            ticket2 = Ticket(ticket_id=2, number='2', topic_id=2, team_id=2)
+            db.session.add(ticket1)
+            db.session.add(ticket2)
+            db.session.commit()
+
+            # Make a request to the get_tickets endpoint with filtering by topic and team
+            response = self.client.get('/tickets?topic_id=1&team_id=1')
+            data = response.get_json()
+
+            # Assert that the filtering is correct
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(data['results']), 1)
+            self.assertEqual(data['results'][0]['number'], '1')
+
+    def test_get_tickets_filtering_by_date_range(self):
+        """Test that the tickets are filtered correctly by date range."""
+        with self.app.app_context():
+            # Create dummy tickets with different creation dates
+            ticket1 = Ticket(ticket_id=1, number='1', created=datetime.now() - timedelta(days=2))
+            ticket2 = Ticket(ticket_id=2, number='2', created=datetime.now())
+            db.session.add(ticket1)
+            db.session.add(ticket2)
+            db.session.commit()
+
+            # Make a request to the get_tickets endpoint with date range filtering
+            response = self.client.get(f'/tickets?created_after={(datetime.now() - timedelta(days=1)).isoformat()}')
+            data = response.get_json()
+
+            # Assert that the filtering is correct
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(data['results']), 1)
+            self.assertEqual(data['results'][0]['number'], '2')
+
+    def test_get_tickets_filtering_by_is_closed(self):
+        """Test that the tickets are filtered correctly by is_closed."""
+        with self.app.app_context():
+            # Create dummy tickets with different closed statuses
+            ticket1 = Ticket(ticket_id=1, number='1', closed=datetime.now())
+            ticket2 = Ticket(ticket_id=2, number='2', closed=None)
+            db.session.add(ticket1)
+            db.session.add(ticket2)
+            db.session.commit()
+
+            # Make a request to the get_tickets endpoint with is_closed filtering
+            response = self.client.get('/tickets?is_closed=true')
             data = response.get_json()
 
             # Assert that the filtering is correct
